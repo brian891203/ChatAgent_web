@@ -11,20 +11,12 @@ def sidebar_head():
     Sets position of radiobuttons (in a row or one beneath another)
     Shows logo in the sidebar
     """
-    # st.set_page_config(
-    #     page_title="國泰金控 | AFlowGent",
-    #     page_icon="./img/icon.png",
-    #     layout="wide",
-    #     initial_sidebar_state="auto"
-    # )
-
-    # st.set_option('deprecation.showfileUploaderEncoding', False)
 
     # SERSitivis logo
-    html_code = show_logo(100, [1, 1, 1, 1], margin=[0, 0, 0, 0])
-    st.sidebar.markdown(html_code, unsafe_allow_html=True)
-    st.sidebar.markdown('')
-    st.sidebar.markdown('')
+    # html_code = show_logo(100, [1, 1, 1, 1], margin=[0, 0, 0, 0])
+    # st.sidebar.markdown(html_code, unsafe_allow_html=True)
+    # st.sidebar.markdown('')
+    # st.sidebar.markdown('')
 
 @st.cache_resource
 def show_logo(width, padding, margin):

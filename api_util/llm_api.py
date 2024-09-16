@@ -2,8 +2,8 @@ import requests
 
 
 # Create llm
-def create_llm(flowId, files):
-    url = f"http://localhost:8080/AflowGent/v1/workflows/{flowId}/LLM"
+def create_llm(files):
+    url = f"http://localhost:8080//ChatAgent/v1/knowledges"
     response = requests.post(url, files=files)
     return response.json()
 

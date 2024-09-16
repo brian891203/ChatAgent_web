@@ -22,7 +22,7 @@ def chatbot():
         - json
     """
 
-    st.title("GPT-with Azure OpenAI")
+    st.title("Chatbot for Financial signals")
 
     # Azure OpenAI service URL and API key
     azure_openai_url = "https://api-csd-lab-je.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-15-preview"

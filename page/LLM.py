@@ -68,6 +68,7 @@ def LLM_page():
                         "fileType": file_type,
                         "uploadedBy": system_id,
                         "modelConfig": {"model": model},
+                        "systemPrompt": system_prompt,
                         "description": file_description
                         # "promptTemplate": {"systemPrompt": system_prompt}
                     }
@@ -119,7 +120,7 @@ def LLM_page():
         pass
         # st.error("No nodes found for the selected workflow.")
 
-    st.header("Delete a KM")
+    st.header("Delete KM")
     delete_km = st.selectbox('Select KM to delete', KM_options[1:])
 
     if st.button('Delete selected KM'):

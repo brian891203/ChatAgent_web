@@ -1,85 +1,68 @@
-import json
 import time
 
 import requests
 import streamlit as st
 
+from api_util import chat_api, llm_api
+
 
 def chatbot():
-    """
-    A simple chatbot using Azure OpenAI.
+    with st.sidebar:
+        # Add workflow selection box
+        KMs = llm_api.get_all_km()
+        KM_options = [f"{km['description']} - {km['uploadedBy']} [{idx}]" for idx, km in enumerate(KMs)]
+        selected_km = st.sidebar.selectbox("Select KM", KM_options)
+        st.write("You selected:", selected_km)
+        selected_KM_id = KMs[KM_options.index(selected_km)]['id']
 
-    This chatbot interacts with the user by sending messages to Azure OpenAI service and displaying the responses.
+    st.title("Chatbot")
 
-    Usage:
-        1. Enter a message in the chat input box.
-        2. The message will be sent to Azure OpenAI service for processing.
-        3. The response from the service will be displayed in the chat.
+    # Initialize the conversation history in session state if not already there
+    if 'messages' not in st.session_state:
+        st.session_state['messages'] = []
 
-    Dependencies:
-        - streamlit
-        - requests
-        - json
-    """
-
-    st.title("Chatbot for Financial signals")
-
-    # Azure OpenAI service URL and API key
-    azure_openai_url = "https://api-csd-lab-je.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-15-preview"
-    api_key = "2933c0c5028844ac83b5071171cb9a5f"
-
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-
-    for message in st.session_state.messages:
+    # Display previous messages from history
+    for message in st.session_state['messages']:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    if prompt := st.chat_input("What is up?"):
-        st.session_state.messages.append({"role": "user", "content": prompt})
+    # Text input for user prompt
+    if user_input := st.chat_input("Ask me anything..."):
+        # Append the user's message to the session state
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        
+        # Display user message in the chat
         with st.chat_message("user"):
-            st.markdown(prompt)
+            st.markdown(user_input)
 
-        with st.chat_message("assistant"):
-            # Build request payload
-            payload = {
-                "model": "gpt-4",
-                "messages": [{"role": "user", "content": prompt}]
-            }
+        # Prepare the backend request with the selected KM ID and user input
+        request_body = {
+            "query": user_input
+        }
 
-            # Send request to Azure OpenAI service
-            headers = {
-                "Content-Type": "application/json",
-                "api-key": api_key
-            }
-            response = requests.post(azure_openai_url, data=json.dumps(payload), headers=headers)
+        print(request_body)
 
-            if response.status_code == 200:
-                response_content = ""
-                try:
-                    response_data = response.json()
-                    for message_obj in response_data.get("choices", []):
-                        if "message" in message_obj:
-                            response_content += message_obj["message"]["content"] + " "
+        # Call the backend API to get the response
+        backend_response = chat_api.create_query(selected_KM_id, request_body)
+        print(backend_response)
 
-                            # Remove extra spaces
-                            response_content = response_content.strip()
-                            
-                    # Display the merged response content
-                    message_placeholder = st.empty()
-                    content = ""
-                    for text in response_content.split():
-                        content += text + " "
-                        message_placeholder.markdown(content)
-                        time.sleep(0.07)
-                    # st.markdown(response_content)
-                    st.session_state.messages.append({"role": "assistant", "content": response_content})
-    
-                except json.JSONDecodeError as e:
-                    st.error(f"JSON decode error: {e.msg}")
-                    st.write("Raw response:", response.text)
-            else:
-                st.error("Failed to get response from Azure OpenAI service: " + response.json().get("error", "Unknown error"))
+        # Extract the assistant's answer from the response
+        if 'answer' in backend_response:
+            answer = backend_response['answer']
+            
+            # Simulate streaming response by splitting the answer into individual characters
+            with st.chat_message("assistant"):
+                message_placeholder = st.empty()  # Placeholder for the message
+                full_response = ""
+                for char in answer:
+                    full_response += char
+                    message_placeholder.markdown(full_response)
+                    time.sleep(0.05)  # Adjust the delay for the streaming effect
 
+            # Append the full assistant's message to the session state
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+
+# Run the chatbot
 if __name__ == "__main__":
     chatbot()

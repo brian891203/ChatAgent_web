@@ -1,5 +1,6 @@
-import streamlit as st
 import graphviz as gv
+import streamlit as st
+
 
 def home_page():
     """
@@ -10,7 +11,7 @@ def home_page():
         pass
 
     # Main page title and caption
-    st.title(f''':rainbow[{"💬 AFlowGent"}]''')
+    st.title(f''':rainbow[{"💬 ChatAgent"}]''')
     st.caption(f''':rainbow[{"🚀 Create your AI agent by work flow patterns"}]''')
 
     st.subheader("Workflow Diagram")
